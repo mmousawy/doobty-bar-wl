@@ -4,6 +4,7 @@ let streamStartTime = null;
 let wins = 0;
 let losses = 0;
 let isLoading = false;
+let largeTeamsOnly = false;
 
 // Get usernames from URL query parameters
 function getBarUsernameFromURL() {
@@ -16,10 +17,14 @@ function getTwitchUsernameFromURL() {
   const nameParam = urlParams.get('twitchUsername');
   return nameParam ? nameParam.trim() : null;
 }
+function getLargeTeamsOnlyFromURL() {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get('largeTeamsOnly') === 'true';
+}
 
 function getBackendUrl() {
   if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname === '') {
-    return 'http://localhost:8080';
+    return 'http://localhost:8787';
   }
   return 'https://doobty-bar-wl-be.murtada-al-mousawy.workers.dev';
 }
@@ -27,7 +32,23 @@ function getBackendUrl() {
 async function loadSettings() {
   barUsername = getBarUsernameFromURL() || '';
   twitchUsername = getTwitchUsernameFromURL() || '';
+  largeTeamsOnly = getLargeTeamsOnlyFromURL();
   streamStartTime = null;
+
+  // Check for missing query params and show errors
+  if (!barUsername) {
+    console.error('Missing barUsername query parameter. Add ?barUsername=PlayerName to URL');
+    document.getElementById('wins').textContent = '?';
+    document.getElementById('losses').textContent = '?';
+    return;
+  }
+  if (!twitchUsername) {
+    console.error('Missing twitchUsername query parameter. Add ?twitchUsername=YourTwitchName to URL');
+    document.getElementById('wins').textContent = '?';
+    document.getElementById('losses').textContent = '?';
+    return;
+  }
+
   const startedAt = await fetchTwitchStreamStartTime(twitchUsername);
   streamStartTime = startedAt ? new Date(startedAt) : null;
 }
@@ -53,7 +74,7 @@ async function fetchStats() {
   try {
     document.getElementById('wins').textContent = '...';
     document.getElementById('losses').textContent = '...';
-    const response = await fetch(`https://api.bar-rts.com/replays?players=${encodeURIComponent(barUsername)}&limit=100`);
+    const response = await fetch(`https://api.bar-rts.com/replays?players=${encodeURIComponent(barUsername)}`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -63,7 +84,14 @@ async function fetchStats() {
     // Filter matches since stream start time
     const filteredMatches = data.data.filter(match => {
       const matchTime = new Date(match.startTime);
-      return matchTime >= streamStartTime;
+      if (matchTime < streamStartTime) return false;
+      if (largeTeamsOnly) {
+        // Only count games with exactly 2 teams, each with 8 players
+        if (!match.AllyTeams || match.AllyTeams.length !== 2) return false;
+        const teamSizes = match.AllyTeams.map(team => team.Players.length);
+        if (!(teamSizes[0] === 8 && teamSizes[1] === 8)) return false;
+      }
+      return true;
     });
     // Count wins and losses
     filteredMatches.forEach(match => {
@@ -107,14 +135,12 @@ async function fetchTwitchStreamStartTime(username) {
 }
 
 function startAutoRefresh() {
-  setInterval(fetchStats, 120000); // 2 minutes
+  setInterval(fetchStats, 60000); // 1 minute
 }
 
 async function init() {
   await loadSettings();
-  if (barUsername && streamStartTime) {
-    fetchStats();
-  }
+  fetchStats();
   startAutoRefresh();
 }
 
