@@ -8,6 +8,7 @@ app.use(cors());
 
 const TWITCH_CLIENT_ID = process.env.TWITCH_CLIENT_ID;
 const TWITCH_CLIENT_SECRET = process.env.TWITCH_CLIENT_SECRET;
+const PORT = process.env.PORT || 8080;
 
 let cachedToken = null;
 let tokenExpiry = 0;
@@ -70,6 +71,6 @@ app.get('/twitch-stream', async (req, res) => {
   }
 });
 
-app.listen(3000, () => {
-  console.log('Backend running on http://localhost:3000');
+app.listen(PORT, () => {
+  console.log(`Backend running on http://localhost:${PORT}`);
 });
