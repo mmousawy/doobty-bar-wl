@@ -72,8 +72,6 @@ async function fetchStats() {
   if (isLoading) return;
   isLoading = true;
   try {
-    document.getElementById('wins').textContent = '...';
-    document.getElementById('losses').textContent = '...';
     const response = await fetch(`https://api.bar-rts.com/replays?players=${encodeURIComponent(barUsername)}`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
