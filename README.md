@@ -44,19 +44,21 @@ To run the backend locally using Wrangler:
 1. Make sure you have [Wrangler](https://developers.cloudflare.com/workers/wrangler/install/) installed.
 2. Set up your `.env` file with your Twitch credentials (see `.env.example`).
 3. Start the Worker locally:
-   
+
    ```bash
    wrangler dev
    ```
+
    This will start the Worker on `http://localhost:8787` by default.
 
 To serve the frontend locally:
 
 1. Use any static file server (for example, with Node.js):
-   
+
    ```bash
    npx serve .
    ```
+
    or open `index.html` directly in your browser.
 
 Make sure your overlay and generator point to the local backend when testing locally.

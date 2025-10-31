@@ -71,7 +71,11 @@
       <p>Usernames are case-sensitive!</p>
       <form onsubmit="event.preventDefault(); generateUrl();">
         <label for="barUsername">BAR Username:</label>
-        <input type="text" id="barUsername" />
+        <input
+          type="text"
+          id="barUsername"
+          placeholder="Include your clan tag"
+        />
         <label for="twitchUsername">Twitch Username:</label>
         <input type="text" id="twitchUsername" />
         <label style="display: flex; align-items: center; margin-top: 1rem">
@@ -97,9 +101,7 @@
           alert("Please enter both BAR and Twitch usernames.");
           return;
         }
-        let url = `https://doobty-bar-wl.pages.dev/render.html?barUsername=${encodeURIComponent(
-          bar
-        )}&twitchUsername=${encodeURIComponent(twitch)}`;
+        let url = `https://doobty-bar-wl.pages.dev/render.html?barUsername=${bar}&twitchUsername=${twitch}`;
         if (largeTeamsOnly) {
           url += "&largeTeamsOnly=true";
         }
