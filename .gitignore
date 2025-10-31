@@ -43,5 +43,4 @@ coverage/
 # Optional: ignore compiled JS from TypeScript
 *.tsbuildinfo
 
-
 .wrangler
