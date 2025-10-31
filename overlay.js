@@ -17,6 +17,13 @@ function getTwitchUsernameFromURL() {
   return nameParam ? nameParam.trim() : null;
 }
 
+function getBackendUrl() {
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname === '') {
+    return 'http://localhost:8080';
+  }
+  return 'https://doobty-bar-wl-be.murtada-al-mousawy.workers.dev';
+}
+
 async function loadSettings() {
   barUsername = getBarUsernameFromURL() || '';
   twitchUsername = getTwitchUsernameFromURL() || '';
@@ -29,7 +36,6 @@ async function loadSettings() {
 function updateDisplay() {
   document.getElementById('wins').textContent = wins;
   document.getElementById('losses').textContent = losses;
-  // No lastUpdated or extra UI
 }
 
 // Fetch stats from BAR API
@@ -57,7 +63,6 @@ async function fetchStats() {
     // Filter matches since stream start time
     const filteredMatches = data.data.filter(match => {
       const matchTime = new Date(match.startTime);
-      console.log('Comparing matchTime:', matchTime, '>= streamStartTime:', streamStartTime, '=>', matchTime >= streamStartTime);
       return matchTime >= streamStartTime;
     });
     // Count wins and losses
@@ -89,10 +94,9 @@ async function fetchStats() {
 async function fetchTwitchStreamStartTime(username) {
   if (!username) return null;
   try {
-    const response = await fetch(`http://localhost:3000/twitch-stream?username=${encodeURIComponent(username)}`);
+    const response = await fetch(`${getBackendUrl()}/twitch-stream?username=${encodeURIComponent(username)}`);
     if (!response.ok) return null;
     const data = await response.json();
-    console.log('Twitch API response:', data);
     if (data.data && data.data.length > 0) {
       return data.data[0].started_at;
     }
