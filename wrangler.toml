@@ -1,4 +1,4 @@
-name = "doobty-bar-wl-worker-be"
+name = "doobty-bar-wl-be"
 main = "worker.js"
 compatibility_date = "2025-10-31"
 
