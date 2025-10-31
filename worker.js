@@ -44,17 +44,37 @@ export default {
           }
         );
         const twitchData = await twitchRes.text();
+        const allowedOrigin = "https://doobty-bar-wl.pages.dev";
+        const requestOrigin = request.headers.get("Origin");
+        const corsHeader = requestOrigin === allowedOrigin ? allowedOrigin : "";
         return new Response(twitchData, {
           status: twitchRes.status,
-          headers: { "Content-Type": "application/json" }
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": corsHeader
+          }
         });
       } catch (err) {
+        const allowedOrigin = "https://doobty-bar-wl.pages.dev";
+        const requestOrigin = request.headers.get("Origin");
+        const corsHeader = requestOrigin === allowedOrigin ? allowedOrigin : "";
         return new Response(JSON.stringify({ error: "Internal server error", details: err.message }), {
           status: 500,
-          headers: { "Content-Type": "application/json" }
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": corsHeader
+          }
         });
       }
     }
-    return new Response("Not found", { status: 404 });
+    const allowedOrigin = "https://doobty-bar-wl.pages.dev";
+    const requestOrigin = request.headers.get("Origin");
+    const corsHeader = requestOrigin === allowedOrigin ? allowedOrigin : "";
+    return new Response("Not found", {
+      status: 404,
+      headers: {
+        "Access-Control-Allow-Origin": corsHeader
+      }
+    });
   }
 };
